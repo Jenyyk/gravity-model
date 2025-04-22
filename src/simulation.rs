@@ -50,10 +50,11 @@ impl Simulation {
     }
 
     pub fn calculate_next_step(&mut self) {
-        let mut new_state = self.states.last().unwrap().clone();
+        let current_state = self.states.last().unwrap();
+        let mut new_state = current_state.clone();
         for body in &mut new_state.bodies {
             body.acceleration = float2::empty();
-            for other in &self.states.last().unwrap().bodies {
+            for other in &current_state.bodies {
                 // skip same body
                 if body.position == other.position {
                     continue;
