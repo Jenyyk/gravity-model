@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Visualize Orbit Data</title>
+    <script src="./plotly.js" charset="utf-8"></script>
+  </head>
+  <body>
+    <div id="plotly"></div>
+
+    <input type="file" id="jsonFile" accept=".json" />
+    <script>
+      // Function to handle the JSON file input and parse the data
+      function handleFile(event) {
+        const file = event.target.files[0];
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+          try {
+            const jsonData = JSON.parse(e.target.result);
+            createPlot(jsonData);
+          } catch (error) {
+            console.error('Error parsing JSON', error);
+          }
+        };
+
+        reader.readAsText(file);
+      }
+
+      // Attach the file input change event to the handleFile function
+      document.getElementById('jsonFile').addEventListener('change', handleFile);
+
+      // Function to create a Plotly graph
+      function createPlot(data) {
+        const layout = {
+          title: 'Orbit Data Visualization',
+          xaxis: {
+            title: 'X-Axis',
+            scaleanchor: 'y'
+          },
+          yaxis: {
+            title: 'Y-Axis',
+            scaleanchor: 'x'
+          },
+        };
+
+        Plotly.newPlot('plotly', data, layout);
+      }
+    </script>
+  </body>
+</html>
