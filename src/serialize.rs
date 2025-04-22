@@ -1,8 +1,8 @@
 use crate::simulation::*;
 use std::fs::File;
 
-use serde::Serialize;
-#[derive(Clone, Debug, Serialize)]
+use serde::{Serialize, Deserialize};
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Trace {
     x: Vec<f64>,
     y: Vec<f64>,

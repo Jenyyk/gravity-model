@@ -1,6 +1,7 @@
 use std::ops::{Add, AddAssign, Mul, MulAssign, Sub, SubAssign};
+use serde::{Serialize, Deserialize};
 
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 #[allow(non_camel_case_types)]
 pub struct float2 {
     x: f64,

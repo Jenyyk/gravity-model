@@ -8,17 +8,61 @@
     body { font-family: sans-serif; margin: 20px; }
     #controls { margin: 10px 0; display: flex; align-items: center; gap: 10px; }
     #plotly { height: 80vh; width: 90vw; }
+    .body-inputs { margin-top: 10px; }
+    .body-inputs label { margin-right: 10px; }
+    .simulation-parameters { margin-top: 20px; }
+    .body-input { display: flex; flex-direction: column; gap: 5px; margin-bottom: 15px; }
+    .remove-body-btn { padding: 5px 10px; }
   </style>
 </head>
 <body>
   <h2>3-Body Orbit Animation</h2>
+
+  <!-- File Upload -->
   <input type="file" id="jsonFile" accept=".json" />
 
+  <!-- Body Input Form -->
+  <div class="body-inputs">
+    <h3>Enter Body Data:</h3>
+    <div id="bodiesContainer">
+      <div class="bodyInput">
+        <label>Position X:</label><input type="number" id="positionX1" value="0">
+        <label>Position Y:</label><input type="number" id="positionY1" value="-1.5">
+        <label>Mass:</label><input type="number" id="mass1" value="500000000">
+        <label>Velocity X:</label><input type="number" id="velocityX1" value="0">
+        <label>Velocity Y:</label><input type="number" id="velocityY1" value="0">
+        <button class="remove-body-btn" onclick="removeBody(1)">Remove Body</button>
+      </div>
+    </div>
+    <button onclick="addBody()">Add another body</button>
+  </div>
+
+  <!-- Simulation Parameters -->
+  <div class="simulation-parameters">
+    <h3>Simulation Parameters:</h3>
+    <label for="timeStep">Time Step:</label>
+    <input type="number" id="timeStep" value="0.01" step="0.001">
+    <label for="steps">Steps:</label>
+    <input type="number" id="steps" value="100000" min="1">
+    <label for="sampleRate">Sample Rate:</label>
+    <input type="number" id="sampleRate" value="100" min="1">
+    <label for="apiURL">API URL:</label>
+    <select id="apiURL">
+      <option value="http://jenyyk.duckdns.org:6378/simulate">Jeníkova Malina (prosím nezahltit)</option>
+      <option value="http://localhost:6378/simulate">localhost</option>
+      <option value="http://192.168.0.186">Jeníkova secret debug možnost</option>
+    </select>
+  </div>
+
+  <!-- Controls -->
   <div id="controls">
     <button id="playPauseBtn">▶ Play</button>
     <label for="speedControl">Speed:</label>
     <input type="range" id="speedControl" min="1" max="500" value="50">
     <span id="speedDisplay">50 ms/frame</span>
+    <button id="submitBtn">Run Simulation</button>
+    <!-- Reset Button -->
+    <button id="resetBtn">↻ Reset</button>
   </div>
 
   <div id="plotly"></div>
@@ -35,6 +79,12 @@
     const playPauseBtn = document.getElementById('playPauseBtn');
     const speedInput = document.getElementById('speedControl');
     const speedDisplay = document.getElementById('speedDisplay');
+    const submitBtn = document.getElementById('submitBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const timeStepInput = document.getElementById('timeStep');
+    const stepsInput = document.getElementById('steps');
+    const sampleRateInput = document.getElementById('sampleRate');
+    const apiURLSelect = document.getElementById('apiURL');
 
     // Speed slider handler
     speedInput.addEventListener('input', () => {
@@ -53,6 +103,11 @@
       } else {
         startAnimation();
       }
+    });
+
+    // Reset Button handler
+    resetBtn.addEventListener('click', () => {
+      resetAnimation();
     });
 
     function startAnimation() {
@@ -78,6 +133,18 @@
       clearInterval(animationInterval);
     }
 
+    // Reset Animation to the start
+    function resetAnimation() {
+      stopAnimation();
+      currentFrame = 0;
+      Plotly.animate('plotly', [frames[currentFrame].name], {
+        frame: { duration: 0, redraw: true },
+        transition: { duration: 0 },
+        mode: 'immediate'
+      });
+      playPauseBtn.textContent = '▶ Play';
+    }
+
     // Load JSON file
     document.getElementById('jsonFile').addEventListener('change', handleFile);
 
@@ -94,6 +161,82 @@
       };
       reader.readAsText(file);
     }
+
+    // Add a body input form
+    function addBody() {
+      const bodyContainer = document.getElementById('bodiesContainer');
+      const bodyIndex = bodyContainer.children.length + 1;
+      const bodyDiv = document.createElement('div');
+      bodyDiv.classList.add('bodyInput');
+      bodyDiv.innerHTML = `
+        <label>Position X:</label><input type="number" id="positionX${bodyIndex}" value="0">
+        <label>Position Y:</label><input type="number" id="positionY${bodyIndex}" value="0">
+        <label>Mass:</label><input type="number" id="mass${bodyIndex}" value="5">
+        <label>Velocity X:</label><input type="number" id="velocityX${bodyIndex}" value="0.2">
+        <label>Velocity Y:</label><input type="number" id="velocityY${bodyIndex}" value="0">
+        <button class="remove-body-btn" onclick="removeBody(${bodyIndex})">Remove Body</button>
+      `;
+      bodyContainer.appendChild(bodyDiv);
+    }
+
+    // Remove a body input form
+    function removeBody(bodyIndex) {
+      const bodyContainer = document.getElementById('bodiesContainer');
+      const bodyElement = document.querySelector(`#positionX${bodyIndex}`).parentElement;
+      bodyContainer.removeChild(bodyElement);
+    }
+
+    // Collect data from form and call API
+    submitBtn.addEventListener('click', async () => {
+      const bodies = [];
+      const bodyElements = document.querySelectorAll('.bodyInput');
+
+      bodyElements.forEach((bodyElement, index) => {
+        const positionX = parseFloat(bodyElement.querySelector(`#positionX${index + 1}`).value);
+        const positionY = parseFloat(bodyElement.querySelector(`#positionY${index + 1}`).value);
+        const mass = parseFloat(bodyElement.querySelector(`#mass${index + 1}`).value);
+        const velocityX = parseFloat(bodyElement.querySelector(`#velocityX${index + 1}`).value);
+        const velocityY = parseFloat(bodyElement.querySelector(`#velocityY${index + 1}`).value);
+
+        // Set acceleration to zero always
+        bodies.push({
+          position: { x: positionX, y: positionY },
+          mass: mass,
+          velocity: { x: velocityX, y: velocityY },
+          acceleration: { x: 0.0, y: 0.0 }
+        });
+      });
+
+      // Get the simulation parameters from the form
+      const timeStep = parseFloat(timeStepInput.value);
+      const steps = parseInt(stepsInput.value);
+      const sampleRate = parseInt(sampleRateInput.value);
+
+      // Get the selected API URL
+      const apiUrl = apiURLSelect.value;
+
+      // Send data to API
+      const requestData = {
+        steps: steps,
+        time_step: timeStep,
+        sample_rate: sampleRate,
+        starting_bodies: bodies
+      };
+
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestData)
+      });
+
+      if (response.ok) {
+        const jsonResponse = await response.json();
+        console.log(jsonResponse);
+        createPlot(jsonResponse.traces);
+      } else {
+        alert('Error: ' + response.statusText);
+      }
+    });
 
     function createPlot(inputData) {
       data = inputData;
@@ -154,7 +297,7 @@
       const layout = {
         title: 'Orbit Data Visualization',
         xaxis: { title: 'X-Axis', scaleanchor: 'y' },
-        yaxis: { title: 'Y-Axis', scaleanchor: 'x' },
+        yaxis: { title: 'Y-Axis'},
       };
 
       Plotly.newPlot('plotly', [...pathTraces, ...bodyTraces], layout).then(() => {

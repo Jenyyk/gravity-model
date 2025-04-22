@@ -4,36 +4,48 @@ mod vector;
 
 use simulation::{Body, Simulation};
 use vector::float2;
+use serialize::Trace;
 
-fn main() {
-    let starting_bodies = vec![
-        Body {
-            position: float2::new(-1e9_f64, 0_f64),
-            mass: 5e24_f64,
-            velocity: float2::new(0_f64, -250_f64),
-            acceleration: float2::empty(),
-        },
-        Body {
-            position: float2::new(1e9_f64, 0_f64),
-            mass: 5e24_f64,
-            velocity: float2::new(0_f64, 250_f64),
-            acceleration: float2::empty(),
-        },
-        Body {
-            position: float2::new(0_f64, 1.5e9_f64),
-            mass: 1e24_f64,
-            velocity: float2::new(-500_f64, 0_f64),
-            acceleration: float2::empty(),
-        },
-    ];
+use serde::{Serialize, Deserialize};
+use actix_cors::Cors;
+use actix_web::{App, HttpResponse, HttpServer, Responder, post, web};
 
-    let mut simulation = Simulation::new(starting_bodies, 2_f64, 5000);
+#[derive(Serialize, Deserialize)]
+struct Request {
+    steps: usize,
+    time_step: f64,
+    sample_rate: usize,
+    starting_bodies: Vec<Body>,
+}
+#[derive(Serialize, Deserialize)]
+struct Response {
+    traces: Vec<Trace>,
+}
 
-    for _ in 0..=50000000 {
+#[post("/simulate")]
+async fn simulate(body: web::Json<Request>) -> impl Responder {
+    let data: Request = body.into_inner();
+    let mut simulation = Simulation::new(data.starting_bodies, data.time_step, data.sample_rate);
+
+    for _ in 0..=data.steps {
         simulation.calculate_next_step();
     }
-    simulation.log_last_state();
 
     let traces = serialize::from_simulation(simulation);
-    serialize::save_file(&traces);
+    HttpResponse::Ok().json(Response { traces })
+}
+
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
+    HttpServer::new(|| {
+        let cors = Cors::permissive();
+
+        App::new()
+            .service(simulate)
+            .wrap(cors)
+    })
+    .bind(("0.0.0.0", 6378))
+    .unwrap()
+    .run()
+    .await
 }

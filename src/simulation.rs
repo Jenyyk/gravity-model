@@ -17,7 +17,9 @@ impl State {
         self.bodies.clone()
     }
 }
-#[derive(Clone)]
+// need to derive for API requests
+use serde::{Serialize, Deserialize};
+#[derive(Clone, Serialize, Deserialize)]
 pub struct Body {
     pub position: float2,
     pub mass: f64,
