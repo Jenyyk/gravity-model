@@ -10,8 +10,7 @@ pub struct Trace {
     r#type: String,
 }
 
-pub fn from_simulation(mut simulation: Simulation) -> Vec<Trace> {
-    simulation.cleanup();
+pub fn from_simulation(simulation: Simulation) -> Vec<Trace> {
     let states = simulation.get_states();
     let num_bodies = states.first().map_or(0, |state| state.get_bodies().len());
 
@@ -25,7 +24,6 @@ pub fn from_simulation(mut simulation: Simulation) -> Vec<Trace> {
         num_bodies
     ];
 
-    // Efficiently iterate over states with a step
     for state in states.iter() {
         for (i, body) in state.get_bodies().iter().enumerate() {
             if i < num_bodies {

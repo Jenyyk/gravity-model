@@ -35,13 +35,9 @@ fn main() {
 
     let mut simulation = Simulation::new(starting_bodies, 0.05_f64, 5000);
 
-    for i in 0..=50000000 {
+    for _ in 0..=50000000 {
         simulation.calculate_next_step();
-        if i % 100000 == 0 {
-            simulation.cleanup();
-        }
     }
-    simulation.cleanup();
     simulation.log_last_state();
 
     let traces = serialize::from_simulation(simulation);

@@ -6,10 +6,10 @@ pub struct Simulation {
     time_step: f64,
     sample: usize,
     states: Vec<State>,
+    idx: usize,
 }
 #[derive(Clone)]
 pub struct State {
-    state_idx: usize,
     bodies: Vec<Body>,
 }
 impl State {
@@ -39,9 +39,9 @@ impl Simulation {
             time_step,
             sample,
             states: vec![State {
-                state_idx: 0,
                 bodies: starting_conditions,
             }],
+            idx: 0,
         }
     }
 
@@ -69,17 +69,12 @@ impl Simulation {
             body.velocity += body.acceleration * self.time_step;
             body.position += body.velocity * self.time_step;
         }
-        new_state.state_idx += 1;
-        self.states.push(new_state);
-    }
-
-    pub fn cleanup(&mut self) {
-        let sample = self.sample;
-        let len = self.states.last().unwrap().state_idx;
-
-        self.states.retain(|state| {
-            state.state_idx % sample == 0 || state.state_idx / sample >= len / sample
-        });
+        if self.idx % self.sample == 0 {
+            self.states.push(new_state);
+        } else {
+            *self.states.last_mut().unwrap() = new_state;
+        }
+        self.idx += 1;
     }
 
     pub fn log_last_state(&self) {
