@@ -1,51 +1,166 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
-  <head>
-    <meta charset="utf-8">
-    <title>Visualize Orbit Data</title>
-    <script src="./plotly.js" charset="utf-8"></script>
-  </head>
-  <body>
-    <div id="plotly"></div>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Visualize Orbit Data</title>
+  <script src="./plotly.js" charset="utf-8"></script>
+  <style>
+    body { font-family: sans-serif; margin: 20px; }
+    #controls { margin: 10px 0; display: flex; align-items: center; gap: 10px; }
+    #plotly { height: 80vh; width: 90vw; }
+  </style>
+</head>
+<body>
+  <h2>3-Body Orbit Animation</h2>
+  <input type="file" id="jsonFile" accept=".json" />
 
-    <input type="file" id="jsonFile" accept=".json" />
-    <script>
-      // Function to handle the JSON file input and parse the data
-      function handleFile(event) {
-        const file = event.target.files[0];
-        const reader = new FileReader();
+  <div id="controls">
+    <button id="playPauseBtn">▶ Play</button>
+    <label for="speedControl">Speed:</label>
+    <input type="range" id="speedControl" min="1" max="500" value="50">
+    <span id="speedDisplay">50 ms/frame</span>
+  </div>
 
-        reader.onload = function(e) {
-          try {
-            const jsonData = JSON.parse(e.target.result);
-            createPlot(jsonData);
-          } catch (error) {
-            console.error('Error parsing JSON', error);
-          }
-        };
+  <div id="plotly"></div>
 
-        reader.readAsText(file);
+  <script>
+    let isPlaying = false;
+    let currentFrame = 0;
+    let animationInterval;
+    let currentSpeed = 50;
+    let frames = [];
+    let pathTraces = [];
+    let data = [];
+
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const speedInput = document.getElementById('speedControl');
+    const speedDisplay = document.getElementById('speedDisplay');
+
+    // Speed slider handler
+    speedInput.addEventListener('input', () => {
+      currentSpeed = parseInt(speedInput.value);
+      speedDisplay.textContent = `${currentSpeed} ms/frame`;
+      if (isPlaying) {
+        stopAnimation();
+        startAnimation();
+      }
+    });
+
+    // Play/Pause handler
+    playPauseBtn.addEventListener('click', () => {
+      if (isPlaying) {
+        stopAnimation();
+      } else {
+        startAnimation();
+      }
+    });
+
+    function startAnimation() {
+      isPlaying = true;
+      playPauseBtn.textContent = '⏸ Pause';
+      animationInterval = setInterval(() => {
+        if (currentFrame >= frames.length) {
+          stopAnimation();
+          return;
+        }
+        Plotly.animate('plotly', [frames[currentFrame].name], {
+          frame: { duration: 0, redraw: true },
+          transition: { duration: 0 },
+          mode: 'immediate'
+        });
+        currentFrame++;
+      }, currentSpeed);
+    }
+
+    function stopAnimation() {
+      isPlaying = false;
+      playPauseBtn.textContent = '▶ Play';
+      clearInterval(animationInterval);
+    }
+
+    // Load JSON file
+    document.getElementById('jsonFile').addEventListener('change', handleFile);
+
+    function handleFile(event) {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const jsonData = JSON.parse(e.target.result);
+          createPlot(jsonData);
+        } catch (error) {
+          console.error('Error parsing JSON', error);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function createPlot(inputData) {
+      data = inputData;
+      currentFrame = 0;
+      stopAnimation();
+      frames = [];
+
+      const steps = data[0].x.length;
+
+      // Full paths
+      pathTraces = data.map(trace => ({
+        ...trace,
+        mode: 'lines',
+        opacity: 0.2,
+        line: {
+          color: trace.line?.color || undefined,
+          width: 1
+        },
+        showlegend: false
+      }));
+
+      // Initial bodies
+      const bodyTraces = data.map(trace => ({
+        x: [trace.x[0]],
+        y: [trace.y[0]],
+        mode: 'markers',
+        marker: {
+          size: 8,
+          color: trace.line?.color || undefined
+        },
+      }));
+
+      // Animation frames (paths stay, bodies update)
+      for (let i = 0; i < steps; i++) {
+        const frameData = [];
+
+        // Static paths
+        for (let trace of pathTraces) {
+          frameData.push({ ...trace, visible: true });
+        }
+
+        // Animated bodies
+        for (let j = 0; j < data.length; j++) {
+          frameData.push({
+            x: [data[j].x[i]],
+            y: [data[j].y[i]],
+            mode: 'markers',
+            marker: {
+              size: 8,
+              color: data[j].line?.color || undefined
+            }
+          });
+        }
+
+        frames.push({ name: i.toString(), data: frameData });
       }
 
-      // Attach the file input change event to the handleFile function
-      document.getElementById('jsonFile').addEventListener('change', handleFile);
+      const layout = {
+        title: 'Orbit Data Visualization',
+        xaxis: { title: 'X-Axis', scaleanchor: 'y' },
+        yaxis: { title: 'Y-Axis', scaleanchor: 'x' },
+      };
 
-      // Function to create a Plotly graph
-      function createPlot(data) {
-        const layout = {
-          title: 'Orbit Data Visualization',
-          xaxis: {
-            title: 'X-Axis',
-            scaleanchor: 'y'
-          },
-          yaxis: {
-            title: 'Y-Axis',
-            scaleanchor: 'x'
-          },
-        };
-
-        Plotly.newPlot('plotly', data, layout);
-      }
-    </script>
-  </body>
+      Plotly.newPlot('plotly', [...pathTraces, ...bodyTraces], layout).then(() => {
+        Plotly.addFrames('plotly', frames);
+      });
+    }
+  </script>
+</body>
 </html>

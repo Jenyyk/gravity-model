@@ -8,32 +8,26 @@ use vector::float2;
 fn main() {
     let starting_bodies = vec![
         Body {
-            position: float2::new(0_f64, 0_f64),
-            mass: 5000000000_f64,
-            velocity: float2::empty(),
+            position: float2::new(-1e9_f64, 0_f64),
+            mass: 5e24_f64,
+            velocity: float2::new(0_f64, -250_f64),
             acceleration: float2::empty(),
         },
         Body {
-            position: float2::new(70_f64, -120_f64),
-            mass: 10_f64,
-            velocity: float2::new(-0.02_f64, 0_f64),
+            position: float2::new(1e9_f64, 0_f64),
+            mass: 5e24_f64,
+            velocity: float2::new(0_f64, 250_f64),
             acceleration: float2::empty(),
         },
         Body {
-            position: float2::new(80_f64, 80_f64),
-            mass: 10_f64,
-            velocity: float2::new(-0.02_f64, 0.02_f64),
-            acceleration: float2::empty(),
-        },
-        Body {
-            position: float2::new(20_f64, 0_f64),
-            mass: 10_f64,
-            velocity: float2::new(0_f64, 0.18_f64),
+            position: float2::new(0_f64, 1.5e9_f64),
+            mass: 1e24_f64,
+            velocity: float2::new(-500_f64, 0_f64),
             acceleration: float2::empty(),
         },
     ];
 
-    let mut simulation = Simulation::new(starting_bodies, 0.05_f64, 5000);
+    let mut simulation = Simulation::new(starting_bodies, 2_f64, 5000);
 
     for _ in 0..=50000000 {
         simulation.calculate_next_step();
