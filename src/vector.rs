@@ -1,5 +1,6 @@
+#![allow(dead_code)]
+use serde::{Deserialize, Serialize};
 use std::ops::{Add, AddAssign, Mul, MulAssign, Sub, SubAssign};
-use serde::{Serialize, Deserialize};
 
 #[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 #[allow(non_camel_case_types)]

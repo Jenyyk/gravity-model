@@ -2,13 +2,12 @@ mod serialize;
 mod simulation;
 mod vector;
 
-use simulation::{Body, Simulation};
-use vector::float2;
 use serialize::Trace;
+use simulation::{Body, Simulation};
 
-use serde::{Serialize, Deserialize};
 use actix_cors::Cors;
 use actix_web::{App, HttpResponse, HttpServer, Responder, post, web};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 struct Request {
@@ -32,6 +31,7 @@ async fn simulate(body: web::Json<Request>) -> impl Responder {
     }
 
     let traces = serialize::from_simulation(simulation);
+    serialize::save_file(&traces, "last_sim.json");
     HttpResponse::Ok().json(Response { traces })
 }
 
@@ -40,9 +40,7 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
         let cors = Cors::permissive();
 
-        App::new()
-            .service(simulate)
-            .wrap(cors)
+        App::new().service(simulate).wrap(cors)
     })
     .bind(("0.0.0.0", 6378))
     .unwrap()

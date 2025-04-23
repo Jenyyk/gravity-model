@@ -1,7 +1,7 @@
 use crate::simulation::*;
 use std::fs::File;
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Trace {
     x: Vec<f64>,
@@ -35,7 +35,7 @@ pub fn from_simulation(simulation: Simulation) -> Vec<Trace> {
     traces
 }
 
-pub fn save_file(traces: &Vec<Trace>) {
-    let file = File::create("data.json").unwrap();
+pub fn save_file(traces: &Vec<Trace>, file_name: &str) {
+    let file = File::create(file_name).unwrap();
     serde_json::to_writer(file, traces).unwrap();
 }

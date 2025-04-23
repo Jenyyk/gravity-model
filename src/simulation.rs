@@ -18,7 +18,7 @@ impl State {
     }
 }
 // need to derive for API requests
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Body {
     pub position: float2,
@@ -80,6 +80,7 @@ impl Simulation {
         self.idx += 1;
     }
 
+    #[allow(dead_code)]
     pub fn log_last_state(&self) {
         for (i, body) in self.states.last().unwrap().bodies.iter().enumerate() {
             println!(
