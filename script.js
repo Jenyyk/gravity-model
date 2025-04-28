@@ -1,4 +1,4 @@
-import init, { simulate } from "/pkg/gravity_model.js";
+import init, { simulate, stable_orbit } from "/pkg/gravity_model.js";
 
 let isPlaying = false;
 let currentFrame = 0;
@@ -16,7 +16,10 @@ const resetBtn = document.getElementById('resetBtn');
 const timeStepInput = document.getElementById('timeStep');
 const stepsInput = document.getElementById('steps');
 const sampleRateInput = document.getElementById('sampleRate');
-const apiURLSelect = document.getElementById('apiURL');
+const stable_orbit_btn = document.getElementById("stableOrbitButton");
+
+// fuck this stupid ass button
+stable_orbit_btn.disabled = true;
 
 // Speed slider handler
 speedInput.addEventListener('input', () => {
@@ -94,6 +97,48 @@ function handleFile(event) {
   reader.readAsText(file);
 }
 
+stable_orbit_btn.addEventListener("click", async () => {
+  const bodyElements = document.querySelectorAll('.bodyInput');
+  if (bodyElements.length !== 2) {
+    console.warn("STOP CLICKING THE FUCKING BUTTON I OBVIOUSLY SAID ONLY FOR TWO BODY SYSTEMS");
+    stable_orbit_btn.disabled = true;
+    return;
+  }
+  const bodies = [];
+
+
+  bodyElements.forEach((bodyElement, index) => {
+    const positionX = parseFloat(bodyElement.querySelector(`#positionX${index + 1}`).value);
+    const positionY = parseFloat(bodyElement.querySelector(`#positionY${index + 1}`).value);
+    const mass = parseFloat(bodyElement.querySelector(`#mass${index + 1}`).value);
+    const velocityX = parseFloat(bodyElement.querySelector(`#velocityX${index + 1}`).value);
+    const velocityY = parseFloat(bodyElement.querySelector(`#velocityY${index + 1}`).value);
+
+    // Set acceleration to zero always
+    bodies.push({
+      position: { x: positionX, y: positionY },
+      mass: mass,
+      velocity: { x: velocityX, y: velocityY },
+      acceleration: { x: 0.0, y: 0.0 }
+    });
+  });
+
+  const request_data = { starting_bodies: bodies }
+  await init();
+  const response = await stable_orbit(request_data);
+
+  const velx1 = document.getElementById("velocityX1")
+  const vely1 = document.getElementById("velocityY1")
+  const velx2 = document.getElementById("velocityX2")
+  const vely2 = document.getElementById("velocityY2")
+
+  console.log(response);
+
+  velx1.value = response.body1_vel.x;
+  vely1.value = response.body1_vel.y;
+  velx2.value = response.body2_vel.x;
+  vely2.value = response.body2_vel.y;
+})
 
 // run WASM
 submitBtn.addEventListener('click', async () => {

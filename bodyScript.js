@@ -1,3 +1,5 @@
+const stable_orbit_btn = document.getElementById("stableOrbitButton");
+
 // Add a body input form
 function addBody() {
   const bodyContainer = document.getElementById('bodiesContainer');
@@ -13,6 +15,9 @@ function addBody() {
     <button class="remove-body-btn" onclick="removeBody(${bodyIndex})">Odeber Těleso</button>
   `;
   bodyContainer.appendChild(bodyDiv);
+
+  if (document.querySelectorAll('.bodyInput').length == 2) { stable_orbit_btn.disabled = false; }
+  else { stable_orbit_btn.disabled = true; }
 }
 
 // Remove a body input form
@@ -20,4 +25,7 @@ function removeBody(bodyIndex) {
   const bodyContainer = document.getElementById('bodiesContainer');
   const bodyElement = document.querySelector(`#positionX${bodyIndex}`).parentElement;
   bodyContainer.removeChild(bodyElement);
+
+  if (document.querySelectorAll('.bodyInput').length == 2) { stable_orbit_btn.disabled = false; }
+  else { stable_orbit_btn.disabled = true; }
 }

@@ -184,6 +184,18 @@ export function simulate(input) {
     return takeFromExternrefTable0(ret[0]);
 }
 
+/**
+ * @param {any} input
+ * @returns {any}
+ */
+export function stable_orbit(input) {
+    const ret = wasm.stable_orbit(input);
+    if (ret[2]) {
+        throw takeFromExternrefTable0(ret[1]);
+    }
+    return takeFromExternrefTable0(ret[0]);
+}
+
 async function __wbg_load(module, imports) {
     if (typeof Response === 'function' && module instanceof Response) {
         if (typeof WebAssembly.instantiateStreaming === 'function') {

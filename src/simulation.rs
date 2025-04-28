@@ -80,6 +80,21 @@ impl Simulation {
         self.idx += 1;
     }
 
+    pub fn calculate_stable_orbit_velocities(&self) -> Result<(float2, float2), String> {
+        let bodies: &Vec<Body> = &self.states[0].bodies;
+        if bodies.len() != 2 { return Err(String::from("Function only available for 2-body systems")); }
+
+        let distance1: float2 = bodies[1].position - bodies[0].position;
+        let vel1: f64 = ((GRAVITATIONAL_CONSTANT * bodies[1].mass) / (distance1.abs() * (1_f64 + (bodies[0].mass / bodies[1].mass)))).sqrt();
+        let vel1vec: float2 = distance1.normalize().perpendicular() * vel1;
+
+        let distance2: float2 = bodies[0].position - bodies[1].position;
+        let vel2: f64 = ((GRAVITATIONAL_CONSTANT * bodies[0].mass) / (distance2.abs() * (1_f64 + (bodies[1].mass / bodies[0].mass)))).sqrt();
+        let vel2vec: float2 = distance2.normalize().perpendicular() * vel2;
+
+        Ok((vel1vec, vel2vec))
+    }
+
     #[allow(dead_code)]
     pub fn log_last_state(&self) {
         for (i, body) in self.states.last().unwrap().bodies.iter().enumerate() {

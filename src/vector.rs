@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 use serde::{Deserialize, Serialize};
-use std::ops::{Add, AddAssign, Mul, MulAssign, Sub, SubAssign};
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 
 #[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 #[allow(non_camel_case_types)]
@@ -27,6 +27,21 @@ impl float2 {
     pub fn abs(&self) -> f64 {
         (self.x.powi(2) + self.y.powi(2)).sqrt()
     }
+
+    pub fn normalize(self) -> Self {
+        let len = &self.abs();
+        Self {
+            x: self.x / len,
+            y: self.y / len,
+        }
+    }
+    pub fn perpendicular(self) -> Self {
+        Self {
+            x: -self.y,
+            y: self.x,
+        }
+    }
+
 }
 
 // Implement primitive operations
@@ -79,6 +94,22 @@ impl MulAssign<f64> for float2 {
         self.y *= scalar;
     }
 }
+impl Div<f64> for float2 {
+    type Output = Self;
+
+    fn div(self, scalar: f64) -> Self {
+        Self {
+            x: self.x / scalar,
+            y: self.y / scalar,
+        }
+    }
+}
+impl DivAssign<f64> for float2 {
+    fn div_assign(&mut self, scalar: f64) {
+        self.x /= scalar;
+        self.y /= scalar;
+    }
+}
 
 // testing
 #[cfg(test)]
@@ -102,7 +133,7 @@ mod test {
         a += b;
         assert_eq!(a, out);
     }
-    // TODO test subtraction
+    // TODO test subtraction and division
 
     #[test]
     fn multiplication() {
@@ -128,5 +159,19 @@ mod test {
         let a: float2 = float2 { x: 3_f64, y: 4_f64 };
 
         assert_eq!(a.abs(), 5_f64);
+    }
+
+    #[test]
+    fn normalize() {
+        let a: float2 = float2 { x: 3_f64, y: 4_f64};
+
+        assert_eq!(a.normalize(), float2::new(0.6_f64, 0.8_f64));
+    }
+
+    #[test]
+    fn perpendicular() {
+        let a: float2 = float2 { x: -20_f64, y: 5_f64};
+
+        assert_eq!(a.perpendicular(), float2::new(-5_f64, -20_f64));
     }
 }
