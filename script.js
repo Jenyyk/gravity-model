@@ -1,4 +1,4 @@
-import init, { simulate, stable_orbit } from "/pkg/gravity_model.js";
+import init, { simulate, stable_orbit } from "./pkg/gravity_model.js";
 
 let isPlaying = false;
 let currentFrame = 0;
@@ -192,7 +192,7 @@ submitBtn.addEventListener('click', async () => {
   downloadButton.onclick = () => {
     const link = document.createElement("a");
     link.href = latestBlob;
-    link.download = "data.json";
+    link.download = "latest_simulation.json";
     link.click();
   }
 });

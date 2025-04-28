@@ -64,11 +64,7 @@ pub fn stable_orbit(input: JsValue) -> Result<JsValue, JsValue> {
             return Err(JsValue::from_str(&error_msg));
         }
     };
-    let simulation = Simulation::new(
-        input_struct.starting_bodies,
-        0_f64,
-        0_usize,
-    );
+    let simulation = Simulation::new(input_struct.starting_bodies, 0_f64, 0_usize);
 
     let (body1_vel, body2_vel) = match simulation.calculate_stable_orbit_velocities() {
         Ok(output) => output,

@@ -41,7 +41,6 @@ impl float2 {
             y: self.x,
         }
     }
-
 }
 
 // Implement primitive operations
@@ -163,14 +162,17 @@ mod test {
 
     #[test]
     fn normalize() {
-        let a: float2 = float2 { x: 3_f64, y: 4_f64};
+        let a: float2 = float2 { x: 3_f64, y: 4_f64 };
 
         assert_eq!(a.normalize(), float2::new(0.6_f64, 0.8_f64));
     }
 
     #[test]
     fn perpendicular() {
-        let a: float2 = float2 { x: -20_f64, y: 5_f64};
+        let a: float2 = float2 {
+            x: -20_f64,
+            y: 5_f64,
+        };
 
         assert_eq!(a.perpendicular(), float2::new(-5_f64, -20_f64));
     }
