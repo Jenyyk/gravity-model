@@ -5,12 +5,12 @@ function addBody() {
   const bodyDiv = document.createElement('div');
   bodyDiv.classList.add('bodyInput');
   bodyDiv.innerHTML = `
-    <label>Position X:</label><input type="number" id="positionX${bodyIndex}" value="0">
-    <label>Position Y:</label><input type="number" id="positionY${bodyIndex}" value="0">
-    <label>Mass:</label><input type="number" id="mass${bodyIndex}" value="5">
-    <label>Velocity X:</label><input type="number" id="velocityX${bodyIndex}" value="0.2">
-    <label>Velocity Y:</label><input type="number" id="velocityY${bodyIndex}" value="0">
-    <button class="remove-body-btn" onclick="removeBody(${bodyIndex})">Remove Body</button>
+    <label>Pozice X:</label><input type="number" id="positionX${bodyIndex}" value="0">
+    <label>Pozice Y:</label><input type="number" id="positionY${bodyIndex}" value="0">
+    <label>Hmotnost:</label><input type="number" id="mass${bodyIndex}" value="5">
+    <label>Rychlost X:</label><input type="number" id="velocityX${bodyIndex}" value="0.2">
+    <label>Rychlost Y:</label><input type="number" id="velocityY${bodyIndex}" value="0">
+    <button class="remove-body-btn" onclick="removeBody(${bodyIndex})">Odeber Těleso</button>
   `;
   bodyContainer.appendChild(bodyDiv);
 }

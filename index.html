@@ -16,33 +16,34 @@
   </style>
 </head>
 <body>
-  <h2>n-Body Orbit Animation</h2>
+  <h2>Animace n-tělesových gravitačních systémů</h2>
 
   <!-- File Upload -->
   <input type="file" id="jsonFile" accept=".json" />
 
   <!-- Body Input Form -->
   <div class="body-inputs">
-    <h3>Enter Body Data:</h3>
+    <h3>Zadej data Těles:</h3>
     <div id="bodiesContainer">
       <div class="bodyInput">
-        <label>Position X:</label><input type="number" id="positionX1" value="0">
-        <label>Position Y:</label><input type="number" id="positionY1" value="-1.5">
-        <label>Mass:</label><input type="number" id="mass1" value="500000000">
-        <label>Velocity X:</label><input type="number" id="velocityX1" value="0">
-        <label>Velocity Y:</label><input type="number" id="velocityY1" value="0">
-        <button class="remove-body-btn" onclick="removeBody(1)">Remove Body</button>
+        <label>Pozice X:</label><input type="number" id="positionX1" value="0">
+        <label>Pozice Y:</label><input type="number" id="positionY1" value="-1.5">
+        <label>Hmotnost:</label><input type="number" id="mass1" value="500000000">
+        <label>Rychlost X:</label><input type="number" id="velocityX1" value="0">
+        <label>Rychlost Y:</label><input type="number" id="velocityY1" value="0">
+        <button class="remove-body-btn" onclick="removeBody(1)">Odeber Těleso</button>
       </div>
     </div>
-    <button onclick="addBody()">Add another body</button>
+    <button onclick="addBody()">Přidej Těleso</button>
+    <button id="stableOrbitButton">Vypočti stabilní orbit (Pouze 2 tělesa)</button>
   </div>
 
   <!-- Simulation Parameters -->
   <div class="simulation-parameters">
-    <h3>Simulation Parameters:</h3>
-    <label for="timeStep">Time Step:</label>
+    <h3>Parametry simulace:</h3>
+    <label for="timeStep">Time Step (dt):</label>
     <input type="number" id="timeStep" value="0.01" step="0.001">
-    <label for="steps">Steps:</label>
+    <label for="steps">Počet kroků:</label>
     <input type="number" id="steps" value="100000" min="1">
     <label for="sampleRate">Sample Rate:</label>
     <input type="number" id="sampleRate" value="100" min="1">
@@ -54,13 +55,17 @@
     <label for="speedControl">Speed:</label>
     <input type="range" id="speedControl" min="1" max="500" value="50">
     <span id="speedDisplay">50 ms/frame</span>
-    <button id="submitBtn">Run Simulation</button>
+    <button id="submitBtn">Spustit simulaci</button>
     <!-- Reset Button -->
     <button id="resetBtn">↻ Reset</button>
   </div>
 
   <div id="plotly"></div>
 
+  <div>
+      <p>Vyrobeno s nenávistí od <a href="https://github.com/jenyyk">Jana Křivského</a> a matikou od <a href="https://github.com/xdazcz">Zbyňka Makovského</a></p>
+      <p>Source kód dostupný na <a href="https://github.com/jenyyk/gravity-model" target="_blank">githubu</a></p>
+  </div>
   <script src="./script.js" type="module"></script>
   <script src="./bodyScript.js"></script>
 </body>
