@@ -5,7 +5,7 @@
   <title>Visualize Orbit Data</title>
   <script src="./plotly.js" charset="utf-8"></script>
   <style>
-    body { font-family: sans-serif; margin: 20px; }
+    body { font-family: sans-serif; margin: 20px; background-color: white; }
     #controls { margin: 10px 0; display: flex; align-items: center; gap: 10px; }
     #plotly { height: 80vh; width: 90vw; }
     .body-inputs { margin-top: 10px; }
@@ -46,12 +46,6 @@
     <input type="number" id="steps" value="100000" min="1">
     <label for="sampleRate">Sample Rate:</label>
     <input type="number" id="sampleRate" value="100" min="1">
-    <label for="apiURL">API URL:</label>
-    <select id="apiURL">
-      <option value="http://jenyyk.duckdns.org:6378/simulate">Jeníkova Malina (prosím nezahltit)</option>
-      <option value="http://localhost:6378/simulate">localhost</option>
-      <option value="http://192.168.0.186:6378/simulate">Jeníkova secret debug možnost</option>
-    </select>
   </div>
 
   <!-- Controls -->
@@ -67,6 +61,7 @@
 
   <div id="plotly"></div>
 
-  <script src="./script.js"></script>
+  <script src="./script.js" type="module"></script>
+  <script src="./bodyScript.js"></script>
 </body>
 </html>

@@ -1,3 +1,5 @@
+import init, { simulate } from "/pkg/gravity_model.js";
+
 let isPlaying = false;
 let currentFrame = 0;
 let animationInterval;
@@ -92,31 +94,8 @@ function handleFile(event) {
   reader.readAsText(file);
 }
 
-// Add a body input form
-function addBody() {
-  const bodyContainer = document.getElementById('bodiesContainer');
-  const bodyIndex = bodyContainer.children.length + 1;
-  const bodyDiv = document.createElement('div');
-  bodyDiv.classList.add('bodyInput');
-  bodyDiv.innerHTML = `
-    <label>Position X:</label><input type="number" id="positionX${bodyIndex}" value="0">
-    <label>Position Y:</label><input type="number" id="positionY${bodyIndex}" value="0">
-    <label>Mass:</label><input type="number" id="mass${bodyIndex}" value="5">
-    <label>Velocity X:</label><input type="number" id="velocityX${bodyIndex}" value="0.2">
-    <label>Velocity Y:</label><input type="number" id="velocityY${bodyIndex}" value="0">
-    <button class="remove-body-btn" onclick="removeBody(${bodyIndex})">Remove Body</button>
-  `;
-  bodyContainer.appendChild(bodyDiv);
-}
 
-// Remove a body input form
-function removeBody(bodyIndex) {
-  const bodyContainer = document.getElementById('bodiesContainer');
-  const bodyElement = document.querySelector(`#positionX${bodyIndex}`).parentElement;
-  bodyContainer.removeChild(bodyElement);
-}
-
-// Collect data from form and call API
+// run WASM
 submitBtn.addEventListener('click', async () => {
   const bodies = [];
   const bodyElements = document.querySelectorAll('.bodyInput');
@@ -142,10 +121,7 @@ submitBtn.addEventListener('click', async () => {
   const steps = parseInt(stepsInput.value);
   const sampleRate = parseInt(sampleRateInput.value);
 
-  // Get the selected API URL
-  const apiUrl = apiURLSelect.value;
-
-  // Send data to API
+  // Send data to WASM
   const requestData = {
     steps: steps,
     time_step: timeStep,
@@ -153,19 +129,11 @@ submitBtn.addEventListener('click', async () => {
     starting_bodies: bodies
   };
 
-  const response = await fetch(apiUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(requestData)
-  });
+  await init();
+  const response = await simulate(requestData);
 
-  if (response.ok) {
-    const jsonResponse = await response.json();
-    console.log(jsonResponse);
-    createPlot(jsonResponse.traces);
-  } else {
-    alert('Error: ' + response.statusText);
-  }
+  console.log(response);
+  createPlot(response);
 });
 
 function createPlot(inputData) {
