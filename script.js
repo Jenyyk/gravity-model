@@ -8,6 +8,7 @@ let frames = [];
 let pathTraces = [];
 let data = [];
 
+const downloadButton = document.getElementById("downloadButton");
 const playPauseBtn = document.getElementById('playPauseBtn');
 const speedInput = document.getElementById('speedControl');
 const speedDisplay = document.getElementById('speedDisplay');
@@ -140,6 +141,8 @@ stable_orbit_btn.addEventListener("click", async () => {
   vely2.value = response.body2_vel.y;
 })
 
+
+let latestBlob = null;
 // run WASM
 submitBtn.addEventListener('click', async () => {
   const bodies = [];
@@ -179,6 +182,19 @@ submitBtn.addEventListener('click', async () => {
 
   console.log(response);
   createPlot(response);
+
+  // put the file up for download
+  if (latestBlob) { URL.revokeObjectURL(latestBlob); }
+  const prettyJson = JSON.stringify(response, null, 2);
+  const blob = new Blob([prettyJson], { type: "application/json" })
+  latestBlob = URL.createObjectURL(blob);
+  downloadButton.disabled = false;
+  downloadButton.onclick = () => {
+    const link = document.createElement("a");
+    link.href = latestBlob;
+    link.download = "data.json";
+    link.click();
+  }
 });
 
 function createPlot(inputData) {
