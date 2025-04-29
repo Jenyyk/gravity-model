@@ -3,10 +3,11 @@ import init, { simulate, stable_orbit } from "./pkg/gravity_model.js";
 let isPlaying = false;
 let currentFrame = 0;
 let animationInterval;
-let currentSpeed = 50;
+let currentSpeed = 5;
 let frames = [];
 let pathTraces = [];
 let data = [];
+let lastSim = null;
 
 const downloadButton = document.getElementById("downloadButton");
 const playPauseBtn = document.getElementById('playPauseBtn');
@@ -38,7 +39,12 @@ playPauseBtn.addEventListener('click', () => {
     stopAnimation();
   } else {
     if (currentFrame >= frames.length) {
-      resetAnimation();
+      currentFrame = 0;
+      Plotly.animate('plotly', [frames[currentFrame].name], {
+        frame: { duration: 0, redraw: true },
+        transition: { duration: 0 },
+        mode: 'immediate'
+      });
     }
     startAnimation();
   }
@@ -75,13 +81,7 @@ function stopAnimation() {
 // Reset Animation to the start
 function resetAnimation() {
   stopAnimation();
-  currentFrame = 0;
-  Plotly.animate('plotly', [frames[currentFrame].name], {
-    frame: { duration: 0, redraw: true },
-    transition: { duration: 0 },
-    mode: 'immediate'
-  });
-  playPauseBtn.textContent = '▶ Play';
+  createPlot(lastSim);
 }
 
 // Load JSON file
@@ -184,6 +184,7 @@ submitBtn.addEventListener('click', async () => {
   const response = await simulate(requestData);
 
   console.log(response);
+  lastSim = response;
   createPlot(response);
 
   // put the file up for download
@@ -205,8 +206,10 @@ function createPlot(inputData) {
   currentFrame = 0;
   stopAnimation();
   frames = [];
+  const maxAnimationFrames = 10_000;
 
   const steps = data[0].x.length;
+  const frameStride = Math.ceil(steps / maxAnimationFrames);
 
   // Full paths
   pathTraces = data.map(trace => ({
@@ -237,17 +240,16 @@ function createPlot(inputData) {
     name: `Těleso ${excelNaming(index + 1)}`
   }));
 
-  // Animation frames (paths stay, bodies update)
-  for (let i = 0; i < steps; i++) {
+  for (let i = 0; i < steps; i += frameStride) {
     const frameData = [];
 
     // Static paths
     for (let trace of pathTraces) {
-      frameData.push({ ...trace, visible: true });
+      frameData.push({ ...trace, visible: (steps > 5000) ? false : true });
     }
 
     // Animated bodies
-    for (let j = 0; j < data.length; j++) {
+    for (let j = 0; j < data.length; j += 1) {
       frameData.push({
         x: [data[j].x[i]],
         y: [data[j].y[i]],
@@ -268,7 +270,7 @@ function createPlot(inputData) {
     yaxis: { title: 'Y-Axis'},
   };
 
-  Plotly.newPlot('plotly', [...pathTraces, ...bodyTraces], layout).then(() => {
+  Plotly.react('plotly', [...pathTraces, ...bodyTraces], layout).then(() => {
     Plotly.addFrames('plotly', frames);
   });
 }
