@@ -218,7 +218,7 @@ function createPlot(inputData) {
   }));
 
   // Initial bodies
-  const bodyTraces = data.map(trace => ({
+  const bodyTraces = data.map((trace, index) => ({
     x: [trace.x[0]],
     y: [trace.y[0]],
     mode: 'markers',
@@ -226,6 +226,7 @@ function createPlot(inputData) {
       size: 8,
       color: trace.line?.color || undefined
     },
+    name: `Těleso ${excelNaming(index + 1)}`
   }));
 
   // Animation frames (paths stay, bodies update)

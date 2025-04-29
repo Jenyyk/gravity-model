@@ -13,6 +13,7 @@ function addBody() {
     <label>Rychlost X:</label><input type="number" id="velocityX${bodyIndex}" value="0.2">
     <label>Rychlost Y:</label><input type="number" id="velocityY${bodyIndex}" value="0">
     <button class="remove-body-btn" onclick="removeBody(${bodyIndex})">Odeber Těleso</button>
+    <span>Těleso ${excelNaming(bodyIndex)}</span>
   `;
   bodyContainer.appendChild(bodyDiv);
 
@@ -28,4 +29,11 @@ function removeBody(bodyIndex) {
 
   if (document.querySelectorAll('.bodyInput').length == 2) { stable_orbit_btn.disabled = false; }
   else { stable_orbit_btn.disabled = true; }
+}
+
+const chars = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"]
+function excelNaming(index) {
+  if (index <= 0) return ""; // base case
+  index--; // adjust for 1-based indexing
+  return excelNaming(Math.floor(index / 26)) + chars[index % 26];
 }
