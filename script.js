@@ -24,8 +24,8 @@ stable_orbit_btn.disabled = true;
 
 // Speed slider handler
 speedInput.addEventListener('input', () => {
-  currentSpeed = parseInt(speedInput.value);
-  speedDisplay.textContent = `${currentSpeed} ms/frame`;
+  currentSpeed = +speedInput.value / 10;
+  speedDisplay.textContent = `${currentSpeed} frames at once`;
   if (isPlaying) {
     stopAnimation();
     startAnimation();
@@ -37,6 +37,9 @@ playPauseBtn.addEventListener('click', () => {
   if (isPlaying) {
     stopAnimation();
   } else {
+    if (currentFrame >= frames.length) {
+      resetAnimation();
+    }
     startAnimation();
   }
 });
@@ -54,13 +57,13 @@ function startAnimation() {
       stopAnimation();
       return;
     }
-    Plotly.animate('plotly', [frames[currentFrame].name], {
+    Plotly.animate('plotly', [frames[Math.floor(currentFrame)].name], {
       frame: { duration: 0, redraw: true },
       transition: { duration: 0 },
       mode: 'immediate'
     });
-    currentFrame++;
-  }, currentSpeed);
+    currentFrame += (currentSpeed >= 1) ? currentSpeed : 1;
+  }, (currentSpeed >= 1) ? 50 : 150 * Math.pow(currentSpeed, -1));
 }
 
 function stopAnimation() {
@@ -208,11 +211,16 @@ function createPlot(inputData) {
   // Full paths
   pathTraces = data.map(trace => ({
     ...trace,
-    mode: 'lines',
+    mode: 'lines+markers',
     opacity: 0.2,
     line: {
       color: trace.line?.color || undefined,
-      width: 1
+      width: 1,
+      shape: 'spline'
+    },
+    marker: {
+      color: trace.line?.color || undefined,
+      size: 4,
     },
     showlegend: false
   }));
