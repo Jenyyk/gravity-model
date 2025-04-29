@@ -82,7 +82,7 @@ function resetAnimation() {
 }
 
 // Load JSON file
-document.getElementById('jsonFile').addEventListener('change', handleFile);
+document.getElementById('jsonFile').addEventListener('input', handleFile);
 
 function handleFile(event) {
   const file = event.target.files[0];
