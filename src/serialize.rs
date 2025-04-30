@@ -6,8 +6,6 @@ use serde::{Deserialize, Serialize};
 pub struct Trace {
     x: Vec<f64>,
     y: Vec<f64>,
-    mode: String,
-    r#type: String,
 }
 
 pub fn from_simulation(simulation: Simulation) -> Vec<Trace> {
@@ -18,8 +16,6 @@ pub fn from_simulation(simulation: Simulation) -> Vec<Trace> {
         Trace {
             x: Vec::with_capacity(states.len()),
             y: Vec::with_capacity(states.len()),
-            mode: String::from("markers"),
-            r#type: String::from("scatter"),
         };
         num_bodies
     ];
