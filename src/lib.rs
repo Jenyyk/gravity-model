@@ -10,7 +10,7 @@ use wasm_bindgen::prelude::*;
 
 #[derive(Deserialize, Serialize)]
 pub struct WasmSimInput {
-    steps: usize,
+    total_time: u64,
     time_step: f64,
     sample_rate: usize,
     starting_bodies: Vec<Body>,
@@ -31,7 +31,9 @@ pub fn simulate(input: JsValue) -> Result<JsValue, JsValue> {
         input_struct.time_step,
         input_struct.sample_rate,
     );
-    for _ in 0..input_struct.steps {
+
+    let steps: u64 = (input_struct.total_time as f64 / input_struct.time_step) as u64;
+    for _ in 0..steps {
         simulation.calculate_next_step();
     }
     let traces = serialize::from_simulation(simulation);
