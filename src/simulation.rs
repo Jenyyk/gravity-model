@@ -80,6 +80,12 @@ impl Simulation {
         self.idx += 1;
     }
 
+    pub fn calculate_n_steps(&mut self, n: u64) {
+        for _ in 0..n {
+            self.calculate_next_step();
+        }
+    }
+
     pub fn calculate_stable_orbit_velocities(&self) -> Result<(float2, float2), String> {
         let bodies: &Vec<Body> = &self.states[0].bodies;
         if bodies.len() != 2 {

@@ -15,10 +15,12 @@ const speedInput = document.getElementById('speedControl');
 const speedDisplay = document.getElementById('speedDisplay');
 const submitBtn = document.getElementById('submitBtn');
 const resetBtn = document.getElementById('resetBtn');
+const purgeBtn = document.getElementById('purgeBtn');
 const timeStepInput = document.getElementById('timeStep');
 const stepsInput = document.getElementById('steps');
 const sampleRateInput = document.getElementById('sampleRate');
 const stable_orbit_btn = document.getElementById("stableOrbitButton");
+const progressBar = document.getElementById("progressBar");
 const performanceReminder = document.getElementById("performanceReminder");
 [stepsInput, sampleRateInput].forEach((el) => el.addEventListener("input", () => {
   performanceReminder.innerHTML = ((+stepsInput.value / +timeStepInput.value) / +sampleRateInput.value > 5000) ? "--- animace nebude obsahovat cesty z důvodu výkonu... <span title='zkuste splnit, že kroky/sample < 5000' style='text-decoration: underline'>proč?</span>" : ""
@@ -58,6 +60,10 @@ playPauseBtn.addEventListener('click', () => {
 resetBtn.addEventListener('click', () => {
   resetAnimation();
 });
+
+purgeBtn.addEventListener('click', () => {
+  Plotly.purge("plotly");
+})
 
 function startAnimation() {
   isPlaying = true;
@@ -150,8 +156,13 @@ stable_orbit_btn.addEventListener("click", async () => {
 
 
 let latestBlob = null;
+const progressCallback = progress => {
+  progressBar.value = progress;
+}
 // run WASM
 submitBtn.addEventListener('click', async () => {
+  Plotly.purge("plotly");
+  submitBtn.disabled = true;
   const bodies = [];
   const bodyElements = document.querySelectorAll('.bodyInput');
 
@@ -185,11 +196,20 @@ submitBtn.addEventListener('click', async () => {
   };
 
   await init();
-  const response = await simulate(requestData);
+  const response = await simulate(requestData, progressCallback);
 
-  console.log(response);
   lastSim = response;
+  // plot that bitch
+  const mockingText = document.createElement("span");
+  mockingText.innerHTML = "čekáme na plotly.js";
+  document.getElementById("mockingTarget").appendChild(mockingText);
+  // yield to rendering
+  await new Promise(requestAnimationFrame);
+  await new Promise(resolve => setTimeout(resolve, 0));
+
   createPlot(response);
+
+  mockingText.remove();
 
   // put the file up for download
   if (latestBlob) { URL.revokeObjectURL(latestBlob); }
@@ -203,6 +223,8 @@ submitBtn.addEventListener('click', async () => {
     link.download = "latest_simulation.json";
     link.click();
   }
+  submitBtn.disabled = false;
+  progressCallback(0);
 });
 
 function createPlot(inputData) {

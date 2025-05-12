@@ -49,20 +49,22 @@
     <input type="number" id="steps" value="1000" min="1">
     <label for="sampleRate">Sample Rate:</label>
     <input type="number" id="sampleRate" value="100" min="1">
+    <progress id="progressBar" value="0" max="100"></progress>
     <span id="performanceReminder"></span>
   </div>
 
   <!-- Controls -->
   <div id="controls">
+    <button id="submitBtn">Spustit simulaci</button>
     <button id="playPauseBtn">▶ Play</button>
     <label for="speedControl">Speed:</label>
     <input type="range" id="speedControl" min="1" max="500" value="50">
     <span id="speedDisplay">5 frames at once</span>
-    <button id="submitBtn">Spustit simulaci</button>
     <!-- Reset Button -->
     <button id="resetBtn">↻ Reset</button>
+    <button id="purgeBtn">🗑 Purge</button>
   </div>
-
+  <div id="mockingTarget"></div>
   <div id="plotly"></div>
 
   <div>

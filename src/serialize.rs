@@ -31,6 +31,7 @@ pub fn from_simulation(simulation: Simulation) -> Vec<Trace> {
     traces
 }
 
+#[allow(dead_code)]
 pub fn save_file(traces: &Vec<Trace>, file_name: &str) {
     let file = File::create(file_name).unwrap();
     serde_json::to_writer(file, traces).unwrap();
