@@ -14,6 +14,8 @@
     .body-input { display: flex; flex-direction: column; gap: 5px; margin-bottom: 15px; }
     .remove-body-btn { padding: 5px 10px; }
   </style>
+  <link rel="canonical" href="https://jenyyk.github.io/gravity-model/" />
+  <link rel="manifest" href="/gravity-model/manifest.webmanifest" >
 </head>
 <body>
   <h2>Animace n-tělesových gravitačních systémů</h2>
@@ -73,5 +75,13 @@
   </div>
   <script src="./script.js" type="module"></script>
   <script src="./bodyScript.js"></script>
+  <script>
+    if (navigator.serviceWorker) {
+      navigator.serviceWorker.register (
+        '/gravity-model/sw.js',
+        {scope: '/gravity-model/'}
+      )
+    }
+  </script>
 </body>
 </html>

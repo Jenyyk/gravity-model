@@ -1,0 +1,21 @@
+{
+  "name": "Gravity Model Simulation",
+  "short_name": "Grav Model",
+  "description": "Gravity Simulator for two-dimensional n-body systems",
+
+  "scope": "/gravity-model/",
+  "start_url": "/gravity-model/",
+
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+
+  "display": "standalone",
+
+  "icons": [
+    {
+      "src": "/gravity-model/icon.png",
+      "type": "image/png",
+      "sizes": "1024x1024"
+    }
+  ]
+}
