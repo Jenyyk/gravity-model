@@ -103,7 +103,12 @@ function handleFile(event) {
   reader.onload = function(e) {
     try {
       const jsonData = JSON.parse(e.target.result);
-      createPlot(jsonData);
+      if (jsonData.version === 1) {
+        createPlot(jsonData.simulation);
+        fill_inputs(jsonData.metadata)
+      } else {
+        createPlot(jsonData);
+      }
     } catch (error) {
       console.error('Error parsing JSON', error);
     }
@@ -213,7 +218,12 @@ submitBtn.addEventListener('click', async () => {
 
   // put the file up for download
   if (latestBlob) { URL.revokeObjectURL(latestBlob); }
-  const prettyJson = JSON.stringify(response, null, 2);
+  const to_file = {
+    version: 1,
+    metadata: requestData,
+    simulation: response,
+  }
+  const prettyJson = JSON.stringify(to_file, null, 2);
   const blob = new Blob([prettyJson], { type: "application/json" })
   latestBlob = URL.createObjectURL(blob);
   downloadButton.disabled = false;
@@ -298,5 +308,26 @@ function createPlot(inputData) {
 
   Plotly.react('plotly', [...pathTraces, ...bodyTraces], layout).then(() => {
     Plotly.addFrames('plotly', frames);
+  });
+}
+
+function fill_inputs(metadata) {
+  timeStepInput.value = metadata.time_step;
+  stepsInput.value = metadata.total_time;
+  sampleRateInput.value = metadata.sample_rate;
+
+  const bodies = metadata.starting_bodies;
+  const num_bodies = bodies.length;
+  document.querySelectorAll(".remove-body-btn").forEach((btn) => btn.click());
+  for (let i = 0; i < num_bodies; i++) {
+    addBody();
+  }
+
+  document.querySelectorAll(".bodyInput").forEach((input, index) => {
+    input.querySelector(`#positionX${index + 1}`).value = bodies[index].position.x;
+    input.querySelector(`#positionY${index + 1}`).value = bodies[index].position.y;
+    input.querySelector(`#mass${index + 1}`).value = bodies[index].mass;
+    input.querySelector(`#velocityX${index + 1}`).value = bodies[index].velocity.x;
+    input.querySelector(`#velocityY${index + 1}`).value = bodies[index].velocity.y;
   });
 }
