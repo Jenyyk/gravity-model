@@ -2,7 +2,7 @@ var GHPATH = 'gravity-model';
 
 var APP_PREFIX = 'jnk_';
 
-var VERSION = 'version_00';
+var VERSION = 'version_01';
 
 var URLS = [
   `${GHPATH}/index.html`,

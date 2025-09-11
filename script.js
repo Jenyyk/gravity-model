@@ -103,9 +103,9 @@ function handleFile(event) {
   reader.onload = function(e) {
     try {
       const jsonData = JSON.parse(e.target.result);
-      if (jsonData.version === 1) {
+      if (jsonData.version === 1 || jsonData.version === 2) {
+        fill_inputs(jsonData.metadata, jsonData.version);
         createPlot(jsonData.simulation);
-        fill_inputs(jsonData.metadata)
       } else {
         createPlot(jsonData);
       }
@@ -169,6 +169,7 @@ submitBtn.addEventListener('click', async () => {
   Plotly.purge("plotly");
   submitBtn.disabled = true;
   const bodies = [];
+  const names = [];
   const bodyElements = document.querySelectorAll('.bodyInput');
 
   bodyElements.forEach((bodyElement, index) => {
@@ -177,14 +178,17 @@ submitBtn.addEventListener('click', async () => {
     const mass = parseFloat(bodyElement.querySelector(`#mass${index + 1}`).value);
     const velocityX = parseFloat(bodyElement.querySelector(`#velocityX${index + 1}`).value);
     const velocityY = parseFloat(bodyElement.querySelector(`#velocityY${index + 1}`).value);
+    const name = bodyElement.querySelector(`#name${index + 1}`).value;
 
     // Set acceleration to zero always
     bodies.push({
       position: { x: positionX, y: positionY },
       mass: mass,
       velocity: { x: velocityX, y: velocityY },
-      acceleration: { x: 0.0, y: 0.0 }
+      acceleration: { x: 0.0, y: 0.0 },
     });
+
+    names.push(name);
   });
 
   // Get the simulation parameters from the form
@@ -197,7 +201,8 @@ submitBtn.addEventListener('click', async () => {
     total_time: time,
     time_step: timeStep,
     sample_rate: sampleRate,
-    starting_bodies: bodies
+    starting_bodies: bodies,
+    names: names
   };
 
   await init();
@@ -219,7 +224,7 @@ submitBtn.addEventListener('click', async () => {
   // put the file up for download
   if (latestBlob) { URL.revokeObjectURL(latestBlob); }
   const to_file = {
-    version: 1,
+    version: 2,
     metadata: requestData,
     simulation: response,
   }
@@ -248,7 +253,7 @@ function createPlot(inputData) {
   const frameStride = Math.ceil(steps / maxAnimationFrames);
 
   // Full paths
-  pathTraces = data.map(trace => ({
+  pathTraces = data.map((trace, index) => ({
     ...trace,
     mode: 'lines+markers',
     opacity: 0.2,
@@ -261,7 +266,8 @@ function createPlot(inputData) {
       color: trace.line?.color || undefined,
       size: 4,
     },
-    showlegend: false
+    showlegend: false,
+    name: `Trasa Tělesa ${document.querySelector(".bodyInput #name" + (index + 1)).value}`
   }));
 
   // Initial bodies
@@ -273,7 +279,7 @@ function createPlot(inputData) {
       size: 8,
       color: trace.line?.color || undefined
     },
-    name: `Těleso ${excelNaming(index + 1)}`
+    name: `Těleso ${document.querySelector(".bodyInput #name" + (index + 1)).value}`
   }));
 
   for (let i = 0; i < steps; i += frameStride) {
@@ -311,7 +317,7 @@ function createPlot(inputData) {
   });
 }
 
-function fill_inputs(metadata) {
+function fill_inputs(metadata, version) {
   timeStepInput.value = metadata.time_step;
   stepsInput.value = metadata.total_time;
   sampleRateInput.value = metadata.sample_rate;
@@ -329,5 +335,8 @@ function fill_inputs(metadata) {
     input.querySelector(`#mass${index + 1}`).value = bodies[index].mass;
     input.querySelector(`#velocityX${index + 1}`).value = bodies[index].velocity.x;
     input.querySelector(`#velocityY${index + 1}`).value = bodies[index].velocity.y;
+    if (version >= 2) {
+      input.querySelector(`#name${index + 1}`).value = metadata.names[index];
+    }
   });
 }

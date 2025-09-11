@@ -13,7 +13,7 @@ function addBody() {
     <label>Rychlost X:</label><input type="number" id="velocityX${bodyIndex}" value="0.2">
     <label>Rychlost Y:</label><input type="number" id="velocityY${bodyIndex}" value="0">
     <button class="remove-body-btn" onclick="removeBody(${bodyIndex})">Odeber Těleso</button>
-    <span>Těleso ${excelNaming(bodyIndex)}</span>
+    <span>Těleso <input type="text" value="${excelNaming(bodyIndex)}" id="name${bodyIndex}"></span>
   `;
   bodyContainer.appendChild(bodyDiv);
 
