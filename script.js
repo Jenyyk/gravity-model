@@ -1,4 +1,4 @@
-import init, { simulate, stable_orbit } from "/pkg/gravity_model.js";
+import init, { simulate, stable_orbit } from "./pkg/gravity_model.js";
 
 let isPlaying = false;
 let currentFrame = 0;
