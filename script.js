@@ -22,7 +22,7 @@ const sampleRateInput = document.getElementById('sampleRate');
 const stable_orbit_btn = document.getElementById("stableOrbitButton");
 const progressBar = document.getElementById("progressBar");
 const performanceReminder = document.getElementById("performanceReminder");
-[stepsInput, sampleRateInput].forEach((el) => el.addEventListener("input", () => {
+[timeStepInput, stepsInput, sampleRateInput].forEach((el) => el.addEventListener("input", () => {
   performanceReminder.innerHTML = ((+stepsInput.value / +timeStepInput.value) / +sampleRateInput.value > 5000) ? "--- animace nebude obsahovat cesty z důvodu výkonu... <span title='zkuste splnit, že kroky/sample < 5000' style='text-decoration: underline'>proč?</span>" : ""
 }))
 
