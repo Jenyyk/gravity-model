@@ -51,7 +51,12 @@ pub fn simulate(input: JsValue, progress_callback: Function) -> Promise {
 
             step = end;
             let progress = step as f64 * steps_inv;
-            let _ = progress_callback.call1(&JsValue::NULL, &JsValue::from_f64(progress));
+            let should_cancel =
+                progress_callback.call1(&JsValue::NULL, &JsValue::from_f64(progress));
+
+            if JsValue::is_truthy(&should_cancel.unwrap_or(JsValue::FALSE)) {
+                return Err(JsValue::from_str("User cancelled"));
+            }
 
             // yield to the browser
             // needed to update the progress bar

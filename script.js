@@ -1,4 +1,4 @@
-import init, { simulate, stable_orbit } from "./pkg/gravity_model.js";
+import init, { simulate, stable_orbit } from "/pkg/gravity_model.js";
 
 let isPlaying = false;
 let currentFrame = 0;
@@ -8,6 +8,7 @@ let frames = [];
 let pathTraces = [];
 let data = [];
 let lastSim = null;
+let shouldCancel = false;
 
 const downloadButton = document.getElementById("downloadButton");
 const playPauseBtn = document.getElementById('playPauseBtn');
@@ -16,6 +17,7 @@ const speedDisplay = document.getElementById('speedDisplay');
 const submitBtn = document.getElementById('submitBtn');
 const resetBtn = document.getElementById('resetBtn');
 const purgeBtn = document.getElementById('purgeBtn');
+const cancelBtn = document.getElementById('cancelBtn');
 const timeStepInput = document.getElementById('timeStep');
 const stepsInput = document.getElementById('steps');
 const sampleRateInput = document.getElementById('sampleRate');
@@ -64,6 +66,11 @@ resetBtn.addEventListener('click', () => {
 purgeBtn.addEventListener('click', () => {
   Plotly.purge("plotly");
 })
+
+cancelBtn.addEventListener('click', () => {
+  shouldCancel = true;
+  submitBtn.disabled = false;
+});
 
 function startAnimation() {
   isPlaying = true;
@@ -169,9 +176,17 @@ stable_orbit_btn.addEventListener("click", async () => {
 let latestBlob = null;
 const progressCallback = progress => {
   progressBar.value = progress;
+  if (shouldCancel) {
+    shouldCancel = false;
+    return true;
+  } else { return false; }
 }
+
 // run WASM
 submitBtn.addEventListener('click', async () => {
+  // so it doesnt end immediately if someone pressed it while no sim was running
+  shouldCancel = false;
+
   Plotly.purge("plotly");
   submitBtn.disabled = true;
   const bodies = [];
@@ -212,7 +227,17 @@ submitBtn.addEventListener('click', async () => {
   };
 
   await init();
-  const response = await simulate(requestData, progressCallback);
+  let response;
+  try {
+    response = await simulate(requestData, progressCallback);
+  } catch (error) {
+    // allow further simulations on errors
+    // errors are mostly user interruption
+    console.error(error)
+    submitBtn.disabled = false;
+    progressBar.value = 0;
+    return;
+  }
 
   lastSim = response;
   // plot that bitch

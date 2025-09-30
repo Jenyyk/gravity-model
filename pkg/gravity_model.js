@@ -224,15 +224,15 @@ export function stable_orbit(input) {
     return takeFromExternrefTable0(ret[0]);
 }
 
-function __wbg_adapter_48(arg0, arg1, arg2) {
+function __wbg_adapter_50(arg0, arg1, arg2) {
     wasm.closure19_externref_shim(arg0, arg1, arg2);
 }
 
-function __wbg_adapter_51(arg0, arg1) {
-    wasm._dyn_core__ops__function__FnMut_____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__hc9deeccdec60ae53(arg0, arg1);
+function __wbg_adapter_53(arg0, arg1) {
+    wasm._dyn_core__ops__function__FnMut_____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h61df44b9916cc395(arg0, arg1);
 }
 
-function __wbg_adapter_100(arg0, arg1, arg2, arg3) {
+function __wbg_adapter_102(arg0, arg1, arg2, arg3) {
     wasm.closure45_externref_shim(arg0, arg1, arg2, arg3);
 }
 
@@ -356,7 +356,7 @@ function __wbg_get_imports() {
                 const a = state0.a;
                 state0.a = 0;
                 try {
-                    return __wbg_adapter_100(a, state0.b, arg0, arg1);
+                    return __wbg_adapter_102(a, state0.b, arg0, arg1);
                 } finally {
                     state0.a = a;
                 }
@@ -467,12 +467,12 @@ function __wbg_get_imports() {
         const ret = false;
         return ret;
     };
-    imports.wbg.__wbindgen_closure_wrapper111 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 20, __wbg_adapter_48);
+    imports.wbg.__wbindgen_closure_wrapper110 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 20, __wbg_adapter_50);
         return ret;
     };
-    imports.wbg.__wbindgen_closure_wrapper154 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 34, __wbg_adapter_51);
+    imports.wbg.__wbindgen_closure_wrapper151 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 34, __wbg_adapter_53);
         return ret;
     };
     imports.wbg.__wbindgen_debug_string = function(arg0, arg1) {
@@ -502,6 +502,10 @@ function __wbg_get_imports() {
     };
     imports.wbg.__wbindgen_is_bigint = function(arg0) {
         const ret = typeof(arg0) === 'bigint';
+        return ret;
+    };
+    imports.wbg.__wbindgen_is_falsy = function(arg0) {
+        const ret = !arg0;
         return ret;
     };
     imports.wbg.__wbindgen_is_function = function(arg0) {
