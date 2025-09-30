@@ -273,7 +273,7 @@ function createPlot(inputData) {
       size: 4,
     },
     showlegend: false,
-    name: `Trasa Tělesa ${document.querySelector(".bodyInput #name" + (index + 1)).value}`
+    name: `Trasa Tělesa ${document.querySelector(".bodyInput #name" + (index + 1))?.value || excelNaming(index + 1)}`
   }));
 
   // Initial bodies
@@ -285,7 +285,7 @@ function createPlot(inputData) {
       size: 8,
       color: trace.line?.color || undefined
     },
-    name: `Těleso ${document.querySelector(".bodyInput #name" + (index + 1)).value}`
+    name: `Těleso ${document.querySelector(".bodyInput #name" + (index + 1))?.value || excelNaming(index + 1)}`
   }));
 
   for (let i = 0; i < steps; i += frameStride) {
