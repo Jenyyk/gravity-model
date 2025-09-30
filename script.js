@@ -103,12 +103,18 @@ function handleFile(event) {
   reader.onload = function(e) {
     try {
       const jsonData = JSON.parse(e.target.result);
-      if (jsonData.version === 1 || jsonData.version === 2) {
-        fill_inputs(jsonData.metadata, jsonData.version);
+
+      // utilize file data
+      const version = jsonData.version || 0;
+
+      if (version === 1 || version === 2) {
+        fill_inputs(jsonData.metadata, version);
         createPlot(jsonData.simulation);
       } else {
         createPlot(jsonData);
       }
+      lastSim = (version >= 1) ? jsonData.simulation : jsonData;
+
     } catch (error) {
       console.error('Error parsing JSON', error);
     }
