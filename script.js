@@ -213,9 +213,9 @@ submitBtn.addEventListener('click', async () => {
   });
 
   // Get the simulation parameters from the form
-  const timeStep = parseFloat(timeStepInput.value);
-  const time = parseInt(stepsInput.value);
-  const sampleRate = parseInt(sampleRateInput.value);
+  const timeStep = +timeStepInput.value;
+  const time = Math.round(+stepsInput.value);
+  const sampleRate = +sampleRateInput.value;
 
   // Send data to WASM
   const requestData = {
